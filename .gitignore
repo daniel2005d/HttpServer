@@ -1,0 +1,10 @@
+.vscode
+__pycache__
+.json
+.js
+.db
+bin
+.vs
+.config
+.user
+.pdb
