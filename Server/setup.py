@@ -16,7 +16,7 @@ setup(
     name="run-httpserver",
     version="1.0",
     py_modules=module_names,
-    install_requires=["flask","waitress","colored"], 
+    install_requires=["flask","waitress","colored", "cmd2"], 
     entry_points={
         "console_scripts": [
             "run-httpserver=main:main",
