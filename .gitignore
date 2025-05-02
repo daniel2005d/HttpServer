@@ -8,3 +8,6 @@ bin
 .config
 .user
 .pdb
+.egg-info
+.zip
+.txt

@@ -1,5 +1,5 @@
 from cmd2 import Cmd
-import cmd2
+import os
 import sys
 from waitress import serve
 from colored import Fore, Style, Back
@@ -24,25 +24,34 @@ class App(Cmd):
         self._server = Server(self.port, self.folder)
         self._server.start()
     
+    def run_command(self, command):
+        self.poutput(f"{Fore.yellow}Result from {Style.bold}{Style.reset}{command} {Fore.yellow}command {Style.reset}\n")
+        result = subprocess.run(["bash","-c", command],  capture_output=True, text=True)
+        output = result.stdout.strip() or result.stderr.strip()
+        self.poutput(output)
+    
     def postcmd(self, stop, line):
         self.prompt = f'[{Fore.green_yellow}{self._server.get_folder()}{Style.reset}]> '
     
     def do_cd(self, command):
-        self._server.set_folder(command.args)
+        directory = command.args.strip()
+        if os.path.exists(directory):
+            self._server.set_folder(directory)
+            self.run_command(f"cd {self._server.get_folder()}")
+            os.chdir(directory)
+        else:
+            print(f"{Style.red}Directory {directory} does not exists{Style.reset}")
     
     def default(self, line):
         try:
             if line.command:
                 command = ''
                 if line.command == 'ls':
-                    command = f'ls {self._server.get_folder()} -lh --color --group-directories-first'
+                    command = f'{line.raw}  -lh --color --group-directories-first'
                 else:
-                    command = f'{line.raw}/{self._server.get_folder()}'
+                    command = {line.raw}
 
-                self.poutput(f"{Fore.yellow}Result from {Style.bold}{Style.reset}{command} {Fore.yellow}command {Style.reset}\n")
-                result = subprocess.run(["bash","-c", command],  capture_output=True, text=True)
-                output = result.stdout.strip() or result.stderr.strip()
-                self.poutput(output)
+                self.run_command(command)
         except Exception as e:
             self.poutput(f"❌ Error: {e}")
     
