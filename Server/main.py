@@ -22,7 +22,7 @@ class App(Cmd):
         #self.register_cmdfinalization_hook(self._postcmd)
 
     def _start_http_server(self):
-        self._server = Server(self.port, self.folder)
+        self._server = Server(self.port)
         self._server.start()
     
     def run_command(self, command):
@@ -32,18 +32,10 @@ class App(Cmd):
         self.poutput(output)
     
     def complete_cd(self, text, line, begidx, endidx):
-        """Autocompleta directorios como Bash."""
-        if not text:
-            text = ''
-        else:
-            text = os.path.expanduser(text)
-
-        # Obtén la parte base y el directorio a listar
-        dirname = os.path.dirname(text)
+        """Autocompleta directorios como Bash sin espacio final."""
+        text = os.path.expanduser(text or '')
+        dirname = os.path.dirname(text) or '.'
         prefix = os.path.basename(text)
-
-        if not dirname:
-            dirname = '.'
 
         try:
             entries = os.listdir(dirname)
@@ -55,14 +47,17 @@ class App(Cmd):
             full_path = os.path.join(dirname, entry)
             if os.path.isdir(full_path) and entry.startswith(prefix):
                 suggestion = os.path.join(dirname, entry)
-                if not suggestion.startswith('/'):
-                    suggestion = os.path.relpath(suggestion)
-                completions.append(suggestion + os.sep)
+                # Asegura que sea relativo si es necesario
+                suggestion = os.path.normpath(suggestion)
+                # Agrega '/' solo si no está al final
+                if not suggestion.endswith(os.sep):
+                    suggestion += os.sep
+                completions.append(suggestion)
 
         return completions
     
     def postcmd(self, stop, line):
-        self.prompt = f'[{Fore.green_yellow}{self._server.get_folder()}{Style.reset}]> '
+        self.prompt = f'[{Fore.green_yellow}{os.getcwd()}{Style.reset}]> '
     
     def do_cd(self, command):
         directory = command.args.strip()
@@ -70,8 +65,6 @@ class App(Cmd):
             directory = self._start_folder
 
         if os.path.exists(directory):
-            self._server.set_folder(directory)
-            self.run_command(f"cd {self._server.get_folder()}")
             os.chdir(directory)
         else:
             print(f"{Style.red}Directory {directory} does not exists{Style.reset}")

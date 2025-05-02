@@ -43,11 +43,10 @@ class Operations:
         return render_template('files.html',files=files)
     
 class Server:
-    def __init__(self, port:int, folder:str):
+    def __init__(self, port:int):
         self.app = Flask(__name__)
-        self.operations = Operations(folder)
+        self.operations = Operations(os.getcwd())
         self.port = port
-        self.folder = folder
 
         @self.app.route('/<file>', methods=['GET'])
         @self.app.route('/', methods=['GET','POST'])
@@ -60,7 +59,7 @@ class Server:
                 color = Fore.black
                 if request.method == 'GET':
                     if file:
-                        file_name = os.path.join(self.folder, file)
+                        file_name = os.path.join(os.getcwd(), file)
                         if os.path.exists(file_name):
                             response = send_file(file_name, as_attachment=True)
                             print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1 {response.status_code}" {Style.reset}')
@@ -84,13 +83,6 @@ class Server:
 
             return message_code, status_code
     
-    def set_folder(self, folder:str):
-        self.folder = folder
-        print(f"New folder {self.folder} set.")
-    
-    def get_folder(self):
-        return self.folder
-    
     def _print_banner(self):
         banner = """
          _   _ _____ ___________  _____                          
@@ -101,9 +93,8 @@ class Server:
         \_| |_/ \_/   \_/ \_|    \____/ \___|_|    \_/ \___|_|   
         """
         print(banner)
-        print(f"{Fore.cyan}Exposed Folder: {Style.bold}{self.folder}{Style.reset}")
+        print(f"{Fore.cyan}Exposed Folder: {Style.bold}{os.getcwd()}{Style.reset}")
         print(f"{Fore.yellow}Running on: {Style.bold}http://0.0.0.0:{self.port}{Style.reset}")
-        print(f"{Fore.green}Current directory: {Style.bold}{os.getcwd()}{Style.reset}")
 
     def start(self):
         self._print_banner()
