@@ -6,7 +6,7 @@ from waitress import serve
 import threading
 from datetime import date
 from colored import Fore, Style, Back
-import sys
+import os
 
 class Operations:
     def __init__(self, folder:str):
@@ -47,36 +47,44 @@ class Server:
         self.app = Flask(__name__)
         self.operations = Operations(folder)
         self.port = port
-        self.folder = folder
+        if folder is None:
+            self.folder = os.getcwd()
+        else:
+            self.folder = folder
 
         @self.app.route('/<file>', methods=['GET'])
         @self.app.route('/', methods=['GET','POST'])
         def index(file:str=None):
-            client_ip = request.headers.get('X-Forwarded-For') or request.headers.get('X-Real-IP') or request.remote_addr
-            current_date = date.today().strftime("%d/%b/%Y %H:%M:%S")
-            status_code = 200
-            message_code = "OK"
-            color = Fore.black
-            if request.method == 'GET':
-                if file:
-                    file_name = os.path.join(self.folder, file)
-                    if os.path.exists(file_name):
-                        response = send_file(file_name, as_attachment=True)
-                        print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1 {response.status_code}" {Style.reset}')
-                        return response
+            try:
+                client_ip = request.headers.get('X-Forwarded-For') or request.headers.get('X-Real-IP') or request.remote_addr
+                current_date = date.today().strftime("%d/%b/%Y %H:%M:%S")
+                status_code = 200
+                message_code = "OK"
+                color = Fore.black
+                if request.method == 'GET':
+                    if file:
+                        file_name = os.path.join(self.folder, file)
+                        if os.path.exists(file_name):
+                            response = send_file(file_name, as_attachment=True)
+                            print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1 {response.status_code}" {Style.reset}')
+                            return response
+                            
+                        else:
+                            color = Fore.red
+                            message_code = "Not Found"
+                            status_code = 404
                         
                     else:
-                        color = Fore.red
-                        message_code = "Not Found"
-                        status_code = 404
-                    
+                        print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1 200 OK" {Style.reset}')
+                        return self.operations.files_list()
                 else:
-                    print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1 200 OK" {Style.reset}')
-                    return self.operations.files_list()
-            else:
-                message_code,status_code = self.operations.upload(request.files['file'])
+                    message_code,status_code = self.operations.upload(request.files['file'])
 
-            print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1" {status_code}-{message_code} {Style.reset}')
+                print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1" {status_code}-{message_code} {Style.reset}')
+            except Exception as e:
+                message_code = str(e)
+                status_code = 500
+
             return message_code, status_code
     
     def _print_banner(self):
@@ -90,7 +98,8 @@ class Server:
         """
         print(banner)
         print(f"{Fore.cyan}Exposed Folder: {Style.bold}{self.folder}{Style.reset}")
-        print(f"{Fore.cyan}Running on: {Style.bold}http://0.0.0.0:{self.port}{Style.reset}")
+        print(f"{Fore.yellow}Running on: {Style.bold}http://0.0.0.0:{self.port}{Style.reset}")
+        print(f"{Fore.green}Current directory: {Style.bold}{os.getcwd()}{Style.reset}")
 
     def start(self):
         self._print_banner()

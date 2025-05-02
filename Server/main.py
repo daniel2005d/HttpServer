@@ -23,8 +23,13 @@ class App(Cmd):
     def default(self, line):
         try:
             if line.command:
-                self.poutput(f"{Fore.yellow}Result from {Style.bold}{Style.reset}{line.raw} {Fore.yellow}command {Style.reset}\n")
-                result = subprocess.run(["bash","-c",line.raw],  capture_output=True, text=True)
+                command = ''
+                if line.command == 'ls':
+                    command = 'ls -lh --color --group-directories-first'
+                else:
+                    command = line.raw
+                self.poutput(f"{Fore.yellow}Result from {Style.bold}{Style.reset}{command} {Fore.yellow}command {Style.reset}\n")
+                result = subprocess.run(["bash","-c", command],  capture_output=True, text=True)
                 output = result.stdout.strip() or result.stderr.strip()
                 self.poutput(output)
         except Exception as e:
