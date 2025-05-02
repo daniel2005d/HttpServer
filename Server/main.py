@@ -15,7 +15,7 @@ class App(Cmd):
         self._flask_proc = None
         self._server = None
         self.port = args.port
-        self.folder = args.folder if args.folder != None else os.getcwd()
+        self.folder = args.folder or os.getcwd()
         self._start_folder = self.folder
         self._start_http_server()
         
@@ -30,6 +30,36 @@ class App(Cmd):
         result = subprocess.run(["bash","-c", command],  capture_output=True, text=True)
         output = result.stdout.strip() or result.stderr.strip()
         self.poutput(output)
+    
+    def complete_cd(self, text, line, begidx, endidx):
+        """Autocompleta directorios como Bash."""
+        if not text:
+            text = ''
+        else:
+            text = os.path.expanduser(text)
+
+        # Obtén la parte base y el directorio a listar
+        dirname = os.path.dirname(text)
+        prefix = os.path.basename(text)
+
+        if not dirname:
+            dirname = '.'
+
+        try:
+            entries = os.listdir(dirname)
+        except FileNotFoundError:
+            return []
+
+        completions = []
+        for entry in entries:
+            full_path = os.path.join(dirname, entry)
+            if os.path.isdir(full_path) and entry.startswith(prefix):
+                suggestion = os.path.join(dirname, entry)
+                if not suggestion.startswith('/'):
+                    suggestion = os.path.relpath(suggestion)
+                completions.append(suggestion + os.sep)
+
+        return completions
     
     def postcmd(self, stop, line):
         self.prompt = f'[{Fore.green_yellow}{self._server.get_folder()}{Style.reset}]> '
