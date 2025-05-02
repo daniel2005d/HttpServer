@@ -15,7 +15,8 @@ class App(Cmd):
         self._flask_proc = None
         self._server = None
         self.port = args.port
-        self.folder = args.folder
+        self.folder = args.folder if args.folder != None else os.getcwd()
+        self._start_folder = self.folder
         self._start_http_server()
         
         #self.register_cmdfinalization_hook(self._postcmd)
@@ -35,6 +36,9 @@ class App(Cmd):
     
     def do_cd(self, command):
         directory = command.args.strip()
+        if directory == '':
+            directory = self._start_folder
+
         if os.path.exists(directory):
             self._server.set_folder(directory)
             self.run_command(f"cd {self._server.get_folder()}")

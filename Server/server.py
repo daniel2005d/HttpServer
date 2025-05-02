@@ -47,10 +47,7 @@ class Server:
         self.app = Flask(__name__)
         self.operations = Operations(folder)
         self.port = port
-        if folder is None:
-            self.folder = os.getcwd()
-        else:
-            self.folder = folder
+        self.folder = folder
 
         @self.app.route('/<file>', methods=['GET'])
         @self.app.route('/', methods=['GET','POST'])
