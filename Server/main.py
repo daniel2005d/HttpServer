@@ -1,4 +1,5 @@
 from cmd2 import Cmd
+import cmd2
 import sys
 from waitress import serve
 from colored import Fore, Style, Back
@@ -12,22 +13,32 @@ class App(Cmd):
         super().__init__(**kwargs)
         self.prompt = '$ '
         self._flask_proc = None
+        self._server = None
         self.port = args.port
         self.folder = args.folder
         self._start_http_server()
+        
+        #self.register_cmdfinalization_hook(self._postcmd)
 
     def _start_http_server(self):
-        server = Server(self.port, self.folder)
-        server.start()
+        self._server = Server(self.port, self.folder)
+        self._server.start()
+    
+    def postcmd(self, stop, line):
+        self.prompt = f'[{Fore.green_yellow}{self._server.get_folder()}{Style.reset}]> '
+    
+    def do_cd(self, command):
+        self._server.set_folder(command.args)
     
     def default(self, line):
         try:
             if line.command:
                 command = ''
                 if line.command == 'ls':
-                    command = 'ls -lh --color --group-directories-first'
+                    command = f'ls {self._server.get_folder()} -lh --color --group-directories-first'
                 else:
-                    command = line.raw
+                    command = f'{line.raw}/{self._server.get_folder()}'
+
                 self.poutput(f"{Fore.yellow}Result from {Style.bold}{Style.reset}{command} {Fore.yellow}command {Style.reset}\n")
                 result = subprocess.run(["bash","-c", command],  capture_output=True, text=True)
                 output = result.stdout.strip() or result.stderr.strip()

@@ -87,6 +87,13 @@ class Server:
 
             return message_code, status_code
     
+    def set_folder(self, folder:str):
+        self.folder = folder
+        print(f"New folder {self.folder} set.")
+    
+    def get_folder(self):
+        return self.folder
+    
     def _print_banner(self):
         banner = """
          _   _ _____ ___________  _____                          
