@@ -25,7 +25,7 @@ class App(Cmd):
         self._server.start()
     
     def run_command(self, command):
-        self.poutput(f"{Fore.yellow}Result from {Style.bold}{Style.reset}{command} {Fore.yellow}command {Style.reset}\n")
+        #self.poutput(f"{Fore.yellow}Result from {Style.bold}{Style.reset}{command} {Fore.yellow}command {Style.reset}\n")
         result = subprocess.run(["bash","-c", command],  capture_output=True, text=True)
         output = result.stdout.strip() or result.stderr.strip()
         self.poutput(output)
@@ -49,14 +49,14 @@ class App(Cmd):
                 if line.command == 'ls':
                     command = f'{line.raw}  -lh --color --group-directories-first'
                 else:
-                    command = {line.raw}
+                    command = line.raw
 
                 self.run_command(command)
         except Exception as e:
             self.poutput(f"❌ Error: {e}")
     
     def do_exit(self, command):
-        return True
+        sys.exit(0)
     
 
 
