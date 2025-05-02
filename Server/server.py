@@ -47,6 +47,9 @@ class Server:
         self.app = Flask(__name__)
         self.operations = Operations(os.getcwd())
         self.port = port
+        self._paths = []
+        self.add_path(os.getcwd())
+
 
         @self.app.route('/<file>', methods=['GET'])
         @self.app.route('/', methods=['GET','POST'])
@@ -60,14 +63,16 @@ class Server:
                 if request.method == 'GET':
                     if file:
                         file_name = os.path.join(os.getcwd(), file)
-                        if os.path.exists(file_name):
-                            response = send_file(file_name, as_attachment=True)
-                            print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1 {response.status_code}" {Style.reset}')
-                            return response
+                        self.add_path(file_name)
+                        for path in self._paths:
+                            if os.path.exists(os.path.join(path, file)):
+                                response = send_file(file_name, as_attachment=True)
+                                print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} {path}{file} HTTP/1.1 {response.status_code}" {Style.reset}')
+                                return response
                             
                         else:
                             color = Fore.red
-                            message_code = "Not Found"
+                            message_code = f"{file} Not Found"
                             status_code = 404
                         
                     else:
@@ -82,6 +87,15 @@ class Server:
                 status_code = 500
 
             return message_code, status_code
+    
+    def add_path(self, path:str):
+        if os.path.isdir(path):
+            directory_name = path
+        else:
+            directory_name = os.path.dirname(path)
+        if os.path.exists(directory_name):
+            if directory_name not in self._paths:
+                self._paths.append(directory_name)
     
     def _print_banner(self):
         banner = """

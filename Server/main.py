@@ -65,6 +65,7 @@ class App(Cmd):
             directory = self._start_folder
 
         if os.path.exists(directory):
+            self._server.add_path(directory)
             os.chdir(directory)
         else:
             print(f"{Style.red}Directory {directory} does not exists{Style.reset}")
