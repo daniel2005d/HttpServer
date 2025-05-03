@@ -1,3 +1,7 @@
-.txt
+*.txt
+__pycache__/
 __pycache__
+*.vscode
+.txt
 .vscode
+*..egg-info

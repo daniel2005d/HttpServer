@@ -1,8 +1,0 @@
-main.py
-setup.py
-run_httpserver.egg-info/PKG-INFO
-run_httpserver.egg-info/SOURCES.txt
-run_httpserver.egg-info/dependency_links.txt
-run_httpserver.egg-info/entry_points.txt
-run_httpserver.egg-info/requires.txt
-run_httpserver.egg-info/top_level.txt

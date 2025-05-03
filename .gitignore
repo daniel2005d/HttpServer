@@ -11,3 +11,5 @@ bin
 .egg-info
 .zip
 .txt
+*.txt
+run_httpserver.egg-info
