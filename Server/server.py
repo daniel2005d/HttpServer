@@ -28,12 +28,12 @@ class Operations:
             return f"{size_gb:.2f} GB"
 
     def upload(self, file):
-        file.save(os.path.join(self._folder, file.filename))
-        return "OK", 200
+        file.save(os.path.join(os.getcwd(), file.filename))
+        return os.path.join(os.getcwd(), file.filename)
 
     def files_list(self):
         files = []
-        for file in glob(f'{self._folder}/*.*'):
+        for file in glob(f'{os.getcwd()}/*.*'):
             if os.path.exists(file):
                 files.append({
                     'name':os.path.basename(file),
@@ -79,7 +79,12 @@ class Server:
                         print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1 200 OK" {Style.reset}')
                         return self.operations.files_list()
                 else:
-                    message_code,status_code = self.operations.upload(request.files['file'])
+                    saved_file = self.operations.upload(request.files['file'])
+                    print(f'[*] {Fore.light_cyan_1} File saved on {saved_file} {Style.reset}\n')
+
+                    message_code = "OK"
+                    status_code = 200
+
 
                 print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1" {status_code}-{message_code} {Style.reset}')
             except Exception as e:
