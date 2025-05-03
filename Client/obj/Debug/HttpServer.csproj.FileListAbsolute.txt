@@ -1,0 +1,7 @@
+D:\Proyectos\HttpServer\Client\Releases\Upload.exe.config
+D:\Proyectos\HttpServer\Client\Releases\Upload.exe
+D:\Proyectos\HttpServer\Client\Releases\Upload.pdb
+D:\Proyectos\HttpServer\Client\obj\Debug\HttpServer.csproj.AssemblyReference.cache
+D:\Proyectos\HttpServer\Client\obj\Debug\HttpServer.csproj.CoreCompileInputs.cache
+D:\Proyectos\HttpServer\Client\obj\Debug\Upload.exe
+D:\Proyectos\HttpServer\Client\obj\Debug\Upload.pdb

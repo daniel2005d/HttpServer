@@ -39,29 +39,37 @@ namespace HttpServer
 
         static async Task Main(string[] args)
         {
-            var operation = new Operations();
-            string server = string.Empty;
-            List<string> files = new List<string>();
-
-            foreach (var arg in args)
+            try
             {
-                if (arg.ToLower().StartsWith("http"))
+                var operation = new Operations();
+                string server = string.Empty;
+                List<string> files = new List<string>();
+
+                foreach (var arg in args)
                 {
-                    server = arg;
+                    if (arg.ToLower().StartsWith("http"))
+                    {
+                        server = arg;
+                    }
+                    else
+                    {
+
+                        files.AddRange(ResolveFilePattern(arg));
+
+                    }
                 }
-                else
+
+                foreach (string file in files)
                 {
-
-                    files.AddRange(ResolveFilePattern(arg));
-
+                    Console.WriteLine($"Uploading {file}");
+                    await operation.Upload(server, file);
                 }
             }
-
-            foreach (string file in files)
+            catch(Exception e)
             {
-                Console.WriteLine($"Uploading {file}");
-                await operation.Upload(server, file);
+                Console.WriteLine(e.ToString());
             }
+            
             
         }
     }
