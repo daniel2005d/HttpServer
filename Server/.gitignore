@@ -4,4 +4,4 @@ __pycache__
 *.vscode
 .txt
 .vscode
-*..egg-info
+httpserver.egg-info/
