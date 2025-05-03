@@ -55,9 +55,21 @@ class App(Cmd):
                 completions.append(suggestion)
 
         return completions
+
+    def complete_add(self, text, line, begidx, endidx):
+        return self.complete_cd(text, line, begidx, endidx)
     
     def postcmd(self, stop, line):
         self.prompt = f'[{Fore.green_yellow}{os.getcwd()}{Style.reset}]> '
+
+    def do_info(self, command):
+        paths = self._server.get_paths()
+        for p in paths:
+            print(f"{Fore.green}[*]{Fore.orange_red_1} {p}{Style.reset}")
+
+    def do_add(self, command):
+        directory = command.args.strip()
+        self._server.add_path(directory)
     
     def do_cd(self, command):
         directory = command.args.strip()

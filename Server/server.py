@@ -97,6 +97,9 @@ class Server:
             if directory_name not in self._paths:
                 self._paths.append(directory_name)
     
+    def get_paths(self):
+        return self._paths
+    
     def _print_banner(self):
         banner = """
          _   _ _____ ___________  _____                          
