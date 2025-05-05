@@ -118,10 +118,12 @@ class Server:
             directory_name = path
         else:
             directory_name = os.path.dirname(path)
-            
+        
         if os.path.exists(directory_name):
+            directory_name = os.path.abspath(directory_name)
             if directory_name not in self._paths:
-                self._paths.append(directory_name)
+                if path not in self._paths:
+                    self._paths.append(directory_name)
         else:
             print(f"{Fore.red}[-] Directory {path} not exists{Style.reset}")
     
