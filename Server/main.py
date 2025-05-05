@@ -101,7 +101,7 @@ class App(Cmd):
 
 
 def main():
-    print(f"{Fore.chartreuse_1}[*] Version {Style.bold}1.3{Style.reset}")
+    print(f"{Fore.chartreuse_1}[*] Version {Style.bold}1.5{Style.reset}")
     parser = argparse.ArgumentParser()
     parser.add_argument("-p","--port", default=8000)
     parser.add_argument("-f","--folder")

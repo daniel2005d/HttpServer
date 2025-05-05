@@ -113,14 +113,15 @@ class Server:
 
 
     def add_path(self, path:str):
-        if os.path.exists(path):
-            if os.path.isdir(path):
-                directory_name = path
-            else:
-                directory_name = os.path.dirname(path)
-            if os.path.exists(directory_name):
-                if directory_name not in self._paths:
-                    self._paths.append(directory_name)
+        
+        if os.path.isdir(path):
+            directory_name = path
+        else:
+            directory_name = os.path.dirname(path)
+            
+        if os.path.exists(directory_name):
+            if directory_name not in self._paths:
+                self._paths.append(directory_name)
         else:
             print(f"{Fore.red}[-] Directory {path} not exists{Style.reset}")
     
