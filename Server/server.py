@@ -49,14 +49,13 @@ class Server:
         self.port = port
         self._paths = []
         self.add_path(os.getcwd())
-
+    
 
         @self.app.route('/<file>', methods=['GET'])
         @self.app.route('/', methods=['GET','POST'])
         def index(file:str=None):
             try:
-                client_ip = request.headers.get('X-Forwarded-For') or request.headers.get('X-Real-IP') or request.remote_addr
-                current_date = date.today().strftime("%d/%b/%Y %H:%M:%S")
+                file_name = file
                 status_code = 200
                 message_code = "OK"
                 color = Fore.black
@@ -66,8 +65,10 @@ class Server:
                         self.add_path(file_name)
                         for path in self._paths:
                             if os.path.exists(os.path.join(path, file)):
+                                file_name = os.path.join(path, file)
                                 response = send_file(file_name, as_attachment=True)
-                                print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} {path}{file} HTTP/1.1 {response.status_code}" {Style.reset}')
+                                self._print(os.path.join(path, file), response.status_code, "OK", request)
+                                #print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} {path}{file} HTTP/1.1 {response.status_code}" {Style.reset}')
                                 return response
                             
                         else:
@@ -76,7 +77,8 @@ class Server:
                             status_code = 404
                         
                     else:
-                        print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1 200 OK" {Style.reset}')
+                        self._print(None, 200, "OK", request)
+                        #print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1 200 OK" {Style.reset}')
                         return self.operations.files_list()
                 else:
                     saved_file = self.operations.upload(request.files['file'])
@@ -85,22 +87,42 @@ class Server:
                     message_code = "OK"
                     status_code = 200
 
-
-                print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1" {status_code}-{message_code} {Style.reset}')
+            
+                #print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1" {status_code}-{message_code} {Style.reset}')
             except Exception as e:
                 message_code = str(e)
                 status_code = 500
-
+            
+            self._print(file_name, status_code, message_code, request)
             return message_code, status_code
-    
+        
+    def _print(self, filename,status_code=None,status_message='', request=None):
+
+        client_ip = request.headers.get('X-Forwarded-For') or request.headers.get('X-Real-IP') or request.remote_addr
+        current_date = date.today().strftime("%d/%b/%Y %H:%M:%S")
+        color = None
+        if status_code is not None:
+            if status_code == 200:
+                color = Fore.green
+            elif status_code == 400 or status_code == 404:
+                color = Fore.yellow
+            elif status_code == 500:
+                color = Fore.red
+
+        print(f'{color}{client_ip} - - [{current_date} ] "{request.method} {Style.bold}/{filename}{Style.reset}{color} HTTP/1.1" {status_code}-{status_message} {Style.reset}')
+
+
     def add_path(self, path:str):
-        if os.path.isdir(path):
-            directory_name = path
+        if os.path.exists(path):
+            if os.path.isdir(path):
+                directory_name = path
+            else:
+                directory_name = os.path.dirname(path)
+            if os.path.exists(directory_name):
+                if directory_name not in self._paths:
+                    self._paths.append(directory_name)
         else:
-            directory_name = os.path.dirname(path)
-        if os.path.exists(directory_name):
-            if directory_name not in self._paths:
-                self._paths.append(directory_name)
+            print(f"{Fore.red}[-] Directory {path} not exists{Style.reset}")
     
     def get_paths(self):
         return self._paths
