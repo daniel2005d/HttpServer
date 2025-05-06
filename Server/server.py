@@ -82,7 +82,7 @@ class Server:
                         return self.operations.files_list()
                 else:
                     saved_file = self.operations.upload(request.files['file'])
-                    print(f'[*] {Fore.light_cyan_1} File saved on {saved_file} {Style.reset}\n')
+                    print(f'\n[*] {Fore.light_cyan_1} File saved on {saved_file} {Style.reset}\n')
 
                     message_code = "OK"
                     status_code = 200

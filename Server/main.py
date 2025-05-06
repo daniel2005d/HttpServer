@@ -64,8 +64,8 @@ class App(Cmd):
 
     def do_info(self, command):
         paths = self._server.get_paths()
-        for p in paths:
-            print(f"{Fore.green}[*]{Fore.orange_red_1} {p}{Style.reset}")
+        for index, p in enumerate(paths):
+            print(f"{Fore.green}[{index}]{Fore.orange_red_1} {p}{Style.reset}")
 
     def do_add(self, command):
         directory = command.args.strip()
@@ -73,14 +73,19 @@ class App(Cmd):
     
     def do_cd(self, command):
         directory = command.args.strip()
-        if directory == '':
-            directory = self._start_folder
-
-        if os.path.exists(directory):
-            self._server.add_path(directory)
+        if directory.isdigit():
+            paths = self._server.get_paths()
+            directory = paths[int(directory)]
             os.chdir(directory)
         else:
-            print(f"{Style.red}Directory {directory} does not exists{Style.reset}")
+            if directory == '':
+                directory = self._start_folder
+
+            if os.path.exists(directory):
+                self._server.add_path(directory)
+                os.chdir(directory)
+            else:
+                print(f"{Style.red}Directory {directory} does not exists{Style.reset}")
     
     def default(self, line):
         try:
@@ -101,7 +106,7 @@ class App(Cmd):
 
 
 def main():
-    print(f"{Fore.chartreuse_1}[*] Version {Style.bold}1.6{Style.reset}")
+    print(f"{Fore.chartreuse_1}[*] Version {Style.bold}1.7{Style.reset}")
     parser = argparse.ArgumentParser()
     parser.add_argument("-p","--port", default=8000)
     parser.add_argument("-f","--folder")
