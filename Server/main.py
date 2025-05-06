@@ -61,6 +61,13 @@ class App(Cmd):
     
     def postcmd(self, stop, line):
         self.prompt = f'[{Fore.green_yellow}{os.getcwd()}{Style.reset}]> '
+    
+    def do_history(self, command):
+        history = self._server.get_history()
+        for h in history:
+            icon = '📤' if h["upload"] else '📥'
+            name = h["name"]
+            print(f'{icon} {name}')
 
     def do_info(self, command):
         paths = self._server.get_paths()
@@ -85,7 +92,7 @@ class App(Cmd):
                 self._server.add_path(directory)
                 os.chdir(directory)
             else:
-                print(f"{Style.red}Directory {directory} does not exists{Style.reset}")
+                print(f"{Fore.red}Directory {directory} does not exists{Style.reset}")
     
     def default(self, line):
         try:
@@ -106,7 +113,7 @@ class App(Cmd):
 
 
 def main():
-    print(f"{Fore.chartreuse_1}[*] Version {Style.bold}1.7{Style.reset}")
+    print(f"{Fore.chartreuse_1}[*] Version {Style.bold}1.8{Style.reset}")
     parser = argparse.ArgumentParser()
     parser.add_argument("-p","--port", default=8000)
     parser.add_argument("-f","--folder")

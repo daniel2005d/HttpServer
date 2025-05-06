@@ -49,6 +49,7 @@ class Server:
         self.port = port
         self._paths = []
         self.add_path(os.getcwd())
+        self._history = []
     
 
         @self.app.route('/<file>', methods=['GET'])
@@ -58,7 +59,7 @@ class Server:
                 file_name = file
                 status_code = 200
                 message_code = "OK"
-                color = Fore.black
+                
                 if request.method == 'GET':
                     if file:
                         file_name = os.path.join(os.getcwd(), file)
@@ -66,22 +67,22 @@ class Server:
                         for path in self._paths:
                             if os.path.exists(os.path.join(path, file)):
                                 file_name = os.path.join(path, file)
+                                self._add_to_history(file_name)
                                 response = send_file(file_name, as_attachment=True)
                                 self._print(os.path.join(path, file), response.status_code, "OK", request)
-                                #print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} {path}{file} HTTP/1.1 {response.status_code}" {Style.reset}')
                                 return response
                             
                         else:
-                            color = Fore.red
                             message_code = f"{file} Not Found"
                             status_code = 404
                         
                     else:
                         self._print(None, 200, "OK", request)
-                        #print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1 200 OK" {Style.reset}')
+                        
                         return self.operations.files_list()
                 else:
                     saved_file = self.operations.upload(request.files['file'])
+                    self._add_to_history(saved_file, True)
                     print(f'\n[*] {Fore.light_cyan_1} File saved on {saved_file} {Style.reset}\n')
 
                     message_code = "OK"
@@ -95,6 +96,13 @@ class Server:
             
             self._print(file_name, status_code, message_code, request)
             return message_code, status_code
+    
+    def _add_to_history(self, path, upload=False):
+        if path not in self._history:
+            self._history.append({
+                'name':path,
+                'upload':upload
+            })
         
     def _print(self, filename,status_code=None,status_message='', request=None):
 
@@ -112,6 +120,9 @@ class Server:
         print(f'{color}{client_ip} - - [{current_date} ] "{request.method} {Style.bold}/{filename}{Style.reset}{color} HTTP/1.1" {status_code}-{status_message} {Style.reset}')
 
 
+    def get_history(self):
+        return self._history
+    
     def add_path(self, path:str):
         
         if os.path.isdir(path):
