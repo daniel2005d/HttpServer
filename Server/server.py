@@ -52,8 +52,8 @@ class Server:
         self._history = []
     
 
-        @self.app.route('/<file>', methods=['GET'])
-        @self.app.route('/', methods=['GET','POST'])
+        #@self.app.route('/<file>', methods=['GET'])
+        @self.app.route('/<path:file>', methods=['GET','POST'])
         def index(file:str=None):
             try:
                 file_name = file
