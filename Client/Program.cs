@@ -18,6 +18,11 @@ namespace HttpServer
             {
                 // Es un patrón
                 string directory = Path.GetDirectoryName(inputPath);
+                if (directory.Equals(string.Empty))
+                {
+                    directory = Environment.CurrentDirectory;
+                }
+
                 string pattern = Path.GetFileName(inputPath);
 
                 if (Directory.Exists(directory))
@@ -53,9 +58,7 @@ namespace HttpServer
                     }
                     else
                     {
-
                         files.AddRange(ResolveFilePattern(arg));
-
                     }
                 }
 
