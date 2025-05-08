@@ -52,7 +52,7 @@ class Server:
         self._history = []
     
 
-        #@self.app.route('/<file>', methods=['GET'])
+        @self.app.route('/', methods=['GET','POST'])
         @self.app.route('/<path:file>', methods=['GET','POST'])
         def index(file:str=None):
             try:
@@ -88,8 +88,6 @@ class Server:
                     message_code = "OK"
                     status_code = 200
 
-            
-                #print(f'{Back.white} {color}{client_ip} - - [{current_date} ] "{request.method} /{file} HTTP/1.1" {status_code}-{message_code} {Style.reset}')
             except Exception as e:
                 message_code = str(e)
                 status_code = 500
