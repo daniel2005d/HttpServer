@@ -37,6 +37,10 @@ namespace HttpServer
                 {
                     files.Add(inputPath);
                 }
+                else
+                {
+                    Console.WriteLine($"File {inputPath} not Found");
+                }
             }
 
             return files;
@@ -44,10 +48,11 @@ namespace HttpServer
 
         static async Task Main(string[] args)
         {
+
+            string server = "http://192.168.56.5:8000"; // Change this to prevent write always URL POST service
             try
             {
                 var operation = new Operations();
-                string server = string.Empty;
                 List<string> files = new List<string>();
 
                 foreach (var arg in args)
