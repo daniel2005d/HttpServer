@@ -72,7 +72,10 @@ class App(Cmd):
         return completions
 
     def complete_add(self, text, line, begidx, endidx):
-        return self.complete_cd(text, line, begidx, endidx)
+        if text.startswith('def'):
+            return ['defaults']
+        else:
+            return self.complete_cd(text, line, begidx, endidx)
     
     def postcmd(self, stop, line):
         self._set_prompt()
@@ -91,7 +94,10 @@ class App(Cmd):
 
     def do_add(self, command):
         directory = command.args.strip()
-        self._server.add_path(directory)
+        if directory == 'defaults':
+            self._add_default_folders()
+        else:
+            self._server.add_path(directory)
     
     def do_cd(self, command):
         directory = command.args.strip()
@@ -128,7 +134,7 @@ class App(Cmd):
 
 
 def main():
-    print(f"{Fore.chartreuse_1}[*] Version {Style.bold}1.10.1{Style.reset}")
+    print(f"{Fore.chartreuse_1}[*] Version {Style.bold}1.10.2{Style.reset}")
     parser = argparse.ArgumentParser()
     parser.add_argument("-p","--port", default=8000)
     parser.add_argument("-f","--folder")
