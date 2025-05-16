@@ -99,6 +99,14 @@ class App(Cmd):
         else:
             self._server.add_path(directory)
     
+    def do_search(self, command):
+        paths = self._server.get_paths()
+        for path in paths:
+            for root, dirs, files in os.walk(path):
+                if command in files:
+                    print(f"{Fore.chartreuse_1}[+] {os.path.join(root, command)}{Style.reset}") 
+
+    
     def do_cd(self, command):
         directory = command.args.strip()
         if directory.isdigit():
@@ -134,7 +142,7 @@ class App(Cmd):
 
 
 def main():
-    print(f"{Fore.chartreuse_1}[*] Version {Style.bold}1.10.2{Style.reset}")
+    print(f"{Fore.chartreuse_1}[*] Version {Style.bold}1.11{Style.reset}")
     parser = argparse.ArgumentParser()
     parser.add_argument("-p","--port", default=8000)
     parser.add_argument("-f","--folder")
