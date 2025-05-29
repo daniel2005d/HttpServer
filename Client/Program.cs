@@ -49,7 +49,7 @@ namespace HttpServer
         static async Task Main(string[] args)
         {
 
-            string server = "http://192.168.56.5:8000"; // Change this to prevent write always URL POST service
+            string server = ""; // Change this to prevent write always URL POST service
             try
             {
                 var operation = new Operations();
