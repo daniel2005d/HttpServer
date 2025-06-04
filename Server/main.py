@@ -1,4 +1,4 @@
-from cmd2 import Cmd
+from cmd2 import Cmd, with_argparser
 import os
 import sys
 from waitress import serve
@@ -45,38 +45,9 @@ class App(Cmd):
     def preloop(self):
         self.onecmd(f'cd {self.folder}')
         self._set_prompt()
-    
-    def complete_cd(self, text, line, begidx, endidx):
-        """Autocompleta directorios como Bash sin espacio final."""
-        text = os.path.expanduser(text or '')
-        dirname = os.path.dirname(text) or '.'
-        prefix = os.path.basename(text)
+   
+   
 
-        try:
-            entries = os.listdir(dirname)
-        except FileNotFoundError:
-            return []
-
-        completions = []
-        for entry in entries:
-            full_path = os.path.join(dirname, entry)
-            if os.path.isdir(full_path) and entry.startswith(prefix):
-                suggestion = os.path.join(dirname, entry)
-                # Asegura que sea relativo si es necesario
-                suggestion = os.path.normpath(suggestion)
-                # Agrega '/' solo si no está al final
-                if not suggestion.endswith(os.sep):
-                    suggestion += os.sep
-                completions.append(suggestion)
-
-        return completions
-
-    def complete_add(self, text, line, begidx, endidx):
-        if text.startswith('def'):
-            return ['defaults']
-        else:
-            return self.complete_cd(text, line, begidx, endidx)
-    
     def postcmd(self, stop, line):
         self._set_prompt()
     
@@ -107,6 +78,10 @@ class App(Cmd):
                     print(f"{Fore.chartreuse_1}[+] {os.path.join(root, command)}{Style.reset}") 
 
     
+
+    complete_cd = Cmd.path_complete
+    complete_add = Cmd.path_complete
+
     def do_cd(self, command):
         directory = command.args.strip()
         if directory.isdigit():
@@ -142,7 +117,7 @@ class App(Cmd):
 
 
 def main():
-    print(f"{Fore.chartreuse_1}[*] Version {Style.bold}1.11{Style.reset}")
+    print(f"{Fore.chartreuse_1}[*] Version {Style.bold}1.12{Style.reset}")
     parser = argparse.ArgumentParser()
     parser.add_argument("-p","--port", default=8000)
     parser.add_argument("-f","--folder")

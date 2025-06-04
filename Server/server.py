@@ -62,11 +62,12 @@ class Server:
                 
                 if request.method == 'GET':
                     if file:
-                        file_name = os.path.join(os.getcwd(), file)
-                        self.add_path(file_name)
+                        #file_name = os.path.join(os.getcwd(), file)
+                        
                         for path in self._paths:
                             if os.path.exists(os.path.join(path, file)):
                                 file_name = os.path.join(path, file)
+                                self.add_path(file_name)
                                 self._add_to_history(file_name)
                                 response = send_file(file_name, as_attachment=True)
                                 self._print(os.path.join(path, file), response.status_code, "OK", request)
@@ -115,7 +116,7 @@ class Server:
             elif status_code == 500:
                 color = Fore.red
 
-        print(f'{color}{client_ip} - - [{current_date} ] "{request.method} {Style.bold}/{filename}{Style.reset}{color} HTTP/1.1" {status_code}-{status_message} {Style.reset}')
+        print(f'{color}{client_ip} - - [{current_date} ] "{request.method} {Style.bold}/{filename}{Style.reset}{color} HTTP/1.1" {Fore.red_3b}{status_code}{Style.reset}-{status_message} {Style.reset}')
 
 
     def get_history(self):
