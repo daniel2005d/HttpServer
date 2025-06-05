@@ -7,6 +7,7 @@ import threading
 from datetime import date
 from colored import Fore, Style, Back
 import os
+from settings import Settings
 
 class Operations:
     def __init__(self, folder:str):
@@ -43,12 +44,9 @@ class Operations:
         return render_template('files.html',files=files)
     
 class Server:
-    def __init__(self, port:int):
+    def __init__(self):
         self.app = Flask(__name__)
         self.operations = Operations(os.getcwd())
-        self.port = port
-        self._paths = []
-        self.add_path(os.getcwd())
         self._history = []
     
 
@@ -64,7 +62,7 @@ class Server:
                     if file:
                         #file_name = os.path.join(os.getcwd(), file)
                         
-                        for path in self._paths:
+                        for path in Settings.paths:
                             if os.path.exists(os.path.join(path, file)):
                                 file_name = os.path.join(path, file)
                                 self.add_path(file_name)
@@ -131,14 +129,12 @@ class Server:
         
         if os.path.exists(directory_name):
             directory_name = os.path.abspath(directory_name)
-            if directory_name not in self._paths:
-                if path not in self._paths:
-                    self._paths.append(directory_name)
+            if directory_name not in Settings.paths:
+                if path not in Settings.paths:
+                    Settings.paths.append(directory_name)
         else:
             print(f"{Fore.red}[-] Directory {path} not exists{Style.reset}")
-    
-    def get_paths(self):
-        return self._paths
+       
     
     def _print_banner(self):
         banner = """
@@ -150,14 +146,13 @@ class Server:
         \_| |_/ \_/   \_/ \_|    \____/ \___|_|    \_/ \___|_|   
         """
         print(banner)
-        print(f"{Fore.cyan}Exposed Folder: {Style.bold}{os.getcwd()}{Style.reset}")
-        print(f"{Fore.yellow}Running on: {Style.bold}http://0.0.0.0:{self.port}{Style.reset}")
+        print(f"{Fore.cyan}Exposed Folder: {Style.bold}{Settings.initial_folder}{Style.reset}")
+        print(f"{Fore.yellow}Running on: {Style.bold}http://0.0.0.0:{Settings.port}{Style.reset}")
 
     def start(self):
         self._print_banner()
         def run_flask():
-            #serve(self.app.run(port=self.port))
-            serve(self.app, host="0.0.0.0", port=self.port)
+            serve(self.app, host="0.0.0.0", port=Settings.port)
             
 
         thread = threading.Thread(target=run_flask)
